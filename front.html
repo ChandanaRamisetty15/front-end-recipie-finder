@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kitchen Alchemy</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #e6ffe6;
+      color: #333;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      background-color: white;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    header h2 {
+      color: #228B22;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .search-box {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .search-box input {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 25px;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .search-box button {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 25px;
+      background-color: #228B22;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .search-box button:hover {
+      background-color: #196619;
+    }
+
+    h1 {
+      text-align: center;
+      color: #228B22;
+    }
+
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 15px;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .category {
+      background: #f8f8f8;
+      padding: 12px;
+      border-radius: 8px;
+      box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .category:hover {
+      background: #e0f7e0;
+    }
+
+    #loading {
+      text-align: center;
+      font-size: 18px;
+      margin-top: 20px;
+      color: #777;
+      display: none;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .recipe-card {
+      border-radius: 10px;
+      background: white;
+      overflow: hidden;
+      box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .recipe-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 6px 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .recipe-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .recipe-card-content {
+      padding: 15px;
+    }
+
+    .recipe-card h3 {
+      margin: 0;
+      color: #228B22;
+    }
+
+    .recipe-card a {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 15px;
+      background-color: #228B22;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    .recipe-card a:hover {
+      background-color: #196619;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      margin-top: 30px;
+      background-color: #333;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h2>🌿 Kitchen Alchemy</h2>
+  </header>
+
+  <div class="container">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Enter ingredients (comma separated)...">
+      <button id="searchButton">Search Via Ingredients</button>
+      <button onclick="gobot()">Chat with AI</button>
+    </div>
+
+    <h1>Welcome to Kitchen Alchemy! 🧙‍♀️</h1>
+    <p style="text-align:center;">Discover magical recipes using ingredients you already have!</p>
+
+    <h3>Popular Categories</h3>
+    <div class="categories">
+      <div class="category">🍝 Pasta</div>
+      <div class="category">🍗 Chicken</div>
+      <div class="category">🍕 Pizza</div>
+      <div class="category">🥗 Salad</div>
+      <div class="category">🍲 Soup</div>
+      <div class="category">🍰 Cake</div>
+      <div class="category">🍛 Curry</div>
+      <div class="category">🍚 Rice</div>
+      <div class="category">🐟 Fish</div>
+      <div class="category">🍞 Bread</div>
+    </div>
+
+    <div id="loading">Loading...</div>
+    <div id="results"></div>
+  </div>
+
+  <footer>
+    &copy; 2025 Kitchen Alchemy. All rights reserved.
+  </footer>
+
+  <script>
+    function gobot() {
+      window.location.href = "aichatbot.html";
+    }
+
+    const API_KEY = 'dc25198905d143ab92093e318c70dfb4'; // Your Spoonacular API key
+
+    function slugify(text) {
+      return text.toString().toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '');
+    }
+
+    async function searchRecipes() {
+      const searchInput = document.getElementById('searchInput');
+      const searchTerm = searchInput.value.trim();
+      const resultsContainer = document.getElementById('results');
+      const loadingIndicator = document.getElementById('loading');
+
+      if (!searchTerm) {
+        alert('Please enter some ingredients');
+        return;
+      }
+
+      loadingIndicator.style.display = 'block';
+      resultsContainer.innerHTML = '';
+
+      try {
+        const response = await fetch(
+          `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${encodeURIComponent(searchTerm)}&number=10&apiKey=${API_KEY}`
+        );
+
+        if (!response.ok) {
+          throw new Error(`API request failed with status ${response.status}`);
+        }
+
+        const recipes = await response.json();
+        displayRecipes(recipes);
+      } catch (error) {
+        resultsContainer.innerHTML = `<p>Error: ${error.message}</p>`;
+      } finally {
+        loadingIndicator.style.display = 'none';
+      }
+    }
+
+    function displayRecipes(recipes) {
+      const resultsContainer = document.getElementById('results');
+
+      if (recipes.length === 0) {
+        resultsContainer.innerHTML = '<p>No recipes found. Try different ingredients.</p>';
+        return;
+      }
+
+      const recipesHTML = recipes.map(recipe => {
+        const recipeUrl = `https://spoonacular.com/recipes/${slugify(recipe.title)}-${recipe.id}`;
+        return `
+          <div class="recipe-card">
+            <img class="recipe-image" src="${recipe.image}" alt="${recipe.title}">
+            <div class="recipe-card-content">
+              <h3>${recipe.title}</h3>
+              <p>✅ Used Ingredients: ${recipe.usedIngredientCount}</p>
+              <p>❌ Missing Ingredients: ${recipe.missedIngredientCount}</p>
+              <a href="${recipeUrl}" target="_blank">View Recipe</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      resultsContainer.innerHTML = `<div class="grid-container">${recipesHTML}</div>`;
+    }
+
+    document.getElementById('searchButton').addEventListener('click', searchRecipes);
+    document.getElementById('searchInput').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        searchRecipes();
+      }
+    });
+  </script>
+</body>
+
+</html>
